@@ -80,7 +80,7 @@ def q2_sum_distribution(era):
     print(f"Q2 data: mean={s.mean():.1f}, sd={s.std(ddof=1):.1f} | theory: {mu_th}, {sd_th:.1f}")
     print(f"Q2 skew={stats.skew(s):.2f}, excess kurtosis={stats.kurtosis(s):.2f}")
     print("Q2 Shapiro-Wilk:", stats.shapiro(s))
-    print("Q2 KS vs theory:", stats.kstest(s, "norm", args=(mu_th, sd_th)))
+    print("Q2 KS vs theory:", stats.kstest(s, stats.norm(mu_th, sd_th).cdf))
 
     # fit a Gaussian curve to the histogram
     dens, edges = np.histogram(s, bins=30, density=True)

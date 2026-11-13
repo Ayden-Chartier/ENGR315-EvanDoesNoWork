@@ -9,7 +9,7 @@ ENGR 315 Computational Methods, JMU
 
 People think the lottery has hot numbers, cold numbers, or some kind of pattern. We wanted to see if that's actually true.
 
-**Dataset:** [Lottery Mega Millions Winning Numbers: Beginning 2002](https://catalog.data.gov/dataset/lottery-mega-millions-winning-numbers-beginning-2002) from the State of New York (data.ny.gov). It's a CSV with about 2,500 drawings and four columns: draw date, the five winning numbers, the Mega Ball, and a multiplier. The game rules changed over the years, so we only use **Oct 2017 to Apr 2025** (main numbers 1-70, Mega Ball 1-25), about 770 drawings.
+**Dataset:** [Lottery Mega Millions Winning Numbers: Beginning 2002](https://catalog.data.gov/dataset/lottery-mega-millions-winning-numbers-beginning-2002) from the State of New York (data.ny.gov). It's a CSV with roughly 2,500 drawings and has four columns: draw date, the five winning numbers, the Mega Ball, and a multiplier. The game rules changed over the years, so we only use **Oct 2017 to Apr 2025** (main numbers 1-70, Mega Ball 1-25), which is about 770 drawings.
 
 **Our three questions:**
 
@@ -17,57 +17,69 @@ People think the lottery has hot numbers, cold numbers, or some kind of pattern.
 2. **Does the total of the five numbers look like a bell curve?** Theory says the mean should be 177.5 and the standard deviation about 43.9.
 3. **Is there a hidden cycle in the draws?** We expect a flat, noisy spectrum with no real peaks.
 
-If the lottery is fair we expect to find nothing. That's still a useful result, because it shows our tests work.
+If the lottery is fair we expect to find nothing. That's still a useful result, because it shows that our tests worked.
 
-## Implementation Details
+## Details
 
-**Prep (all questions):** load the CSV with pandas, split the winning numbers into five columns, add a column for the total, and filter to the Oct 2017 to Apr 2025 era.
+**Prep:** load the CSV with pandas, split the winning numbers into five columns, add a column for the total, and filter to the Oct 2017 to Apr 2025 timeframe.
 
 | Question | Method | Metrics | Tools | Plots |
 |---|---|---|---|---|
 | 1. Even distribution? | Chi-square goodness-of-fit test, checked with a simulation of fair draws | Counts per number, chi-square, p-value | numpy, scipy.stats | Bar chart of counts vs. expected |
 | 2. Bell curve? | Fit a normal curve to the histogram of totals | Mean, standard deviation, R², Shapiro-Wilk p-value | scipy.stats, scipy.optimize.curve_fit | Histogram with fitted curve, Q-Q plot |
-| 3. Hidden cycle? | FFT of the totals in date order, plus autocorrelation | Power spectrum, tallest peak vs. shuffled data, autocorrelation | numpy.fft, scipy.signal, statsmodels | Power spectrum, autocorrelation plot |
+| 3. Hidden cycle? | FFT of the totals in date order. | Power spectrum, tallest peak vs. shuffled data, autocorrelation | numpy.fft, scipy.signal, statsmodels | Power spectrum, autocorrelation plot |
 
-**Packages:** numpy, pandas, scipy, statsmodels, matplotlib. Code is in `analysis.py`.
+**Packages:** numpy, pandas, scipy, statsmodels, matplotlib.
 
-**Rough plots from the proposal:**
-
-![Figure 1](figures/fig1_frequency.png)
-![Figure 2](figures/fig2_sum.png)
-![Figure 3](figures/fig3_spectrum.png)
-
----
+**Code:** Q1 is in `Solution to Question 1.py`. Q2 and Q3 are still to come.
 
 ## Results
 
-*Coming after we run the analysis.*
+### Question 1: Are the numbers evenly distributed?
+
+We counted how many times each main number (1-70) and each Mega Ball (1-25) was drawn in the 776 drawings from Oct 2017 to Apr 2025, then ran a chi-square goodness-of-fit test against a perfectly uniform draw. Since numbers can't repeat within a draw, we also simulated a bunch of fair draws to see what chi-square values pure luck gives, and checked where ours landed.
+
+**Command-line output:**
+
+draws in era: 776
+Q1 main numbers: chi2=63.6 (df=69), p=0.661
+Q1 mega ball:    chi2=22.9 (df=24), p=0.525
+Q1 most extreme main numbers: [ 3 10 31] z = [2.23 2.09 1.96]
+Q1 simulated p-value (main numbers): 0.525
+
+**Figure:**
+
+![Q1 results](figures/q1_frequency.png)
+
+*Figure 1. Number of times each main number (1-70) and each Mega Ball (1-25) was drawn, Oct 2017 to Apr 2025. The red dashed line is the expected count for a perfectly uniform draw. The p-values come from a chi square goodness of fit test.*
+
+### Question 2: Bell curve?
+
+*Coming in the next phase.*
+
+### Question 3: Hidden cycle?
+
+*Coming in the next phase.*
 
 ## Conclusions
 
-*Coming later.*
+### Question 1: Are the numbers evenly distributed?
 
----
+For the main numbers, the chi square test gave χ² = 63.6 (df = 69) and p = 0.661. For the Mega Ball it gave χ² = 22.9 (df = 24) and p = 0.525. Both are above 0.05, so we found no evidence that any number is drawn more or less than chance would predict. The simulation agrees (p = 0.525): our chi square sits right in the middle of what fair draws produce. Some numbers did show up more than others. Main number 3 was drawn the most, and 3, 10, and 31 had z-scores around 2. But with 70 numbers, a few landing around 2 is normal. So the data doesn't back up the idea of "hot" and "cold" numbers, the differences jus look like random variation.
+
 
 ## Actions That Need to Be Completed
 
 - [x] Pick dataset and write proposal
 - [x] Rough plots
-- [ ] Create GitHub repo and add both of us
-- [ ] Clean the data
-- [ ] Run Q1, Q2, and Q3
+- [x] Create GitHub repo and add both of us
+- [x] Clean the data
+- [x] Run Q1
+- [ ] Run Q2 and Q3
 - [ ] Save final figures
-- [ ] Write results and conclusions
+- [ ] Write results and conclusions for Q2 and Q3
 - [ ] Report and presentation
-
-**Issues:** numbers in a draw can't repeat, which slightly breaks the chi-square assumptions, so we check it with a simulation. Spectrum peaks can show up by chance, so we compare the tallest one to shuffled data.
-
----
 
 ## References
 
-[1] State of New York, "Lottery Mega Millions Winning Numbers: Beginning 2002," data.ny.gov. [Online]. Available: https://catalog.data.gov/dataset/lottery-mega-millions-winning-numbers-beginning-2002. Accessed: Oct. 2026.
-
-[2] USA Mega, "Mega Millions Statistics" (game versions and number ranges). [Online]. Available: https://www.usamega.com/mega-millions/statistics/7/3/1. Accessed: Oct. 2026.
-
-[3] P. Virtanen et al., "SciPy 1.0: Fundamental algorithms for scientific computing in Python," *Nature Methods*, vol. 17, pp. 261-272, 2020.
+[1] State of New York, "Lottery Mega Millions Winning Numbers: Beginning 2002," data.ny.gov. [Online]. Available: https://catalog.data.gov/dataset/lottery-mega-millions-winning-numbers-beginning-2002.
